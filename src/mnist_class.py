@@ -16,9 +16,11 @@ import random
 import glob
 import warnings
 import os
+from hilbert_flatten import *
 
 train_path = 'data/mnist/train'
 test_path = 'data/mnist/test'
+classes = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
 # ONLY RUN THESE IF HAVENT ALREADY CREATED IMAGES
 if not os.path.isdir(train_path):
@@ -69,14 +71,12 @@ datagen = ImageDataGenerator(rescale=1./255)
 train_batches = datagen.flow_from_directory(directory=train_path,
                                             target_size=(28, 28),
                                             color_mode="grayscale",
-                                            classes=['0', '1', '2', '3', '4',
-                                                     '5', '6', '7', '8', '9'],
+                                            classes=classes,
                                             batch_size=10)
 test_batches = datagen.flow_from_directory(directory=test_path,
                                            target_size=(28, 28),
                                            color_mode="grayscale",
-                                           classes=['0', '1', '2', '3', '4',
-                                                    '5', '6', '7', '8', '9'],
+                                           classes=classes,
                                            batch_size=10,
                                            shuffle=False)
 
@@ -92,9 +92,9 @@ if not os.path.isfile("models/mnist.h5") or True:
         MaxPool2D(),
         Conv2D(48, kernel_size=3, padding='same', activation='relu'),
         MaxPool2D(),
-        Flatten(),
-        Dense(256, activation='relu'),
-        Dense(10, activation='softmax'),
+        HilbertFlatten(),
+        Dense(64, activation='relu'),
+        Dense(train_batches.num_classes, activation='softmax'),
     ])
 
     model.summary()
